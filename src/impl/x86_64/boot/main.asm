@@ -14,6 +14,7 @@ _start:
 
     call setup_page_tables
     call enable_paging
+    call enable_interupts               ;not sure if other steps are required before this or not, not implemented yet
 
     lgdt [gdt64.pointer]
     jmp gdt64.code_segment:long_mode_start  ;jump into main64.asm, set up segment regs and call the kernel_main entrypoint
@@ -48,14 +49,19 @@ check_cpuid:
     mov al, 'C'
     jmp error
 
-;check if cpu id supports extended processor info
+;check if the cpu supports extended processor info using cpuid
+;   requires to have checked for cpuid prior to calling
 ;https://wiki.osdev.org/CPUID
+;https://wiki.osdev.org/Setting_Up_Long_Mode
+;longmode essentially unlocks extra cpu functionality
+;   - 64 bit registers (rax, rbx, etc)
+;   - 
 check_long_mode:
     mov eax, 0x80000000         ;'intel-extended' code for cpuid
     cpuid                       ;uses eax as arg, returns a value greater than the magic number if
                                 ; the processor supports extended info
     cmp eax, 0x80000001         ;if eax is indeed greaater than 0x80000000 we support longmode
-    jb .no_long_mode
+    jb .no_long_mode            ;if not longmode is not supported
 
     mov eax, 0x80000001         ;'intel-features' code for cpuid
     cpuid                       ;sotres a value into edx based on eax input
@@ -89,11 +95,12 @@ setup_page_tables:
     ret
 
 enable_paging:
-    ;pass page loc to cpu
+    ;pass the beginning of the page table to cpu
     mov eax, page_table_l4
     mov cr3, eax
 
     ;enable PAE flag from cr4 reg
+    ;   PAE mode enables the page map to reference up to 36-bit page addresses
     mov eax, cr4        ;cr4 contains cpu configuration flags
     or eax, 1 << 5      ;bit 5 of cr4 is PAE 'physical address extension'. we turn that on. When it is off paging supports 32bit addresses, when it is on paging supports up to 64bit addresses
     mov cr4, eax
@@ -103,7 +110,8 @@ enable_paging:
     ;EDX:EAX ← MSR[ECX];   https://www.felixcloutier.com/x86/rdmsr
     ;A bit to note is bit 0 (System Call Enable SCE)
     rdmsr               ; This is modifying the 64-bit Model Scecific Register (MSR), uses eax AND edx due to needing 64 bits of total capacity
-    or eax, 1 << 8      ;    turns on the 8th bit of the eax reg    (bit 8 of eax is for long-mode-enable, we never enabled long mode in `check_long_mode`)
+    or eax, 1 << 8      ;    turns on the 8th bit of the eax reg    (bit 8 of eax is for long-mode-enable, we never actually enabled long mode in `check_long_mode`)
+                        ;    switches from real mode into protected mode
     wrmsr               ; Writes the eax and edx back into the 64-bit MSR
 
     ; enable paging
@@ -111,6 +119,9 @@ enable_paging:
     or eax, 1 << 31     ;bit 31 is paging, or-ing enables paging
     mov cr0, eax
     
+    ret
+
+enable_interupts:
     ret
 
 ;error serves as a way out of this initialization assembly file

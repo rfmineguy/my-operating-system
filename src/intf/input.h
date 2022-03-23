@@ -3,5 +3,7 @@
 
 char getch();
 char* getstr();
+char* input_prompt(char* prompt);
+
 
 #endif

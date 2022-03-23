@@ -14,8 +14,6 @@ char* WELCOME_MESSAGE[8] = {
 "//     // //               ///////   ////////  "
 };
 
-char* test = " *******   ********         *******    ********";
-
 //clear before calling this function
 void print_welcome() {
     for (size_t i = 0; i < 8; i++) {
@@ -23,7 +21,11 @@ void print_welcome() {
         tty_print_new_line();
     }
     tty_print_new_line();
+
+    tty_print_set_color(PRINT_COLOR_CYAN, PRINT_COLOR_BLACK);
     tty_print_str_endl("Welcome to RF OS. A kernel being developed by Riley Fischer");
+    tty_print_str_endl("It currently does absolutely nothing.");
+    //input_prompt("Type a character : ");
 }
 
 void kernel_main() {

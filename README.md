@@ -8,3 +8,10 @@ An intro to operating systems development
 
 # To load OS
 1. qemu-system-x86_64 -cdrom dist/x86_64/kernel.iso
+
+
+# Kernel load process
+1. Check if we were loaded via multiboot2
+2. Ensure that we can retrieve cpu information via cpuid
+    - https://wiki.osdev.org/CPUID
+3. Ensure that longmode is available
