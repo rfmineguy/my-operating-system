@@ -2,7 +2,9 @@
 An intro to operating systems development
 
 # To build an iso
-sh start-docker-container.sh
-make build_x86-64
+1. sh start-docker-container.sh
+2. make build-x86_64
+3. The iso file will be generated under /dist/x86_64/kernel.iso
 
-* The iso file will be generated under /dist/x86_64/kernel.iso
+# To load OS
+1. qemu-system-x86_64 -cdrom dist/x86_64/kernel.iso
