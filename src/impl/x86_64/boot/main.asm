@@ -17,6 +17,7 @@ _start:
     call enable_interupts               ;not sure if other steps are required before this or not, not implemented yet
 
     lgdt [gdt64.pointer]
+    ;lidt [idt64.pointer]                ;don't know if this is correct
     jmp gdt64.code_segment:long_mode_start  ;jump into main64.asm, set up segment regs and call the kernel_main entrypoint
 
     hlt
@@ -144,7 +145,7 @@ page_table_l2: ;level 2 page table
     resb 4096
 
 stack_bottom:
-    resb 4096 * 4
+    resb 4096 * 4       ;16,384 bytes
 stack_top:
 
 ;read only data
@@ -159,5 +160,3 @@ gdt64:      ;global descriptor table
     dw $-gdt64-1
     dq gdt64
 
-;idt should hold 256 interupts (Interupt descriptor table)
-; each of which are 

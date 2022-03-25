@@ -1,12 +1,14 @@
 #include "../../intf/input.h"
 #include "../../intf/tty.h"
 
-char getch() {
+char prompt_ch() {
     return ' ';
 }
 
-char* input_prompt(char* prompt) {
-    tty_print_str(prompt);
+char* prompt_str() {
+    return NULL;
+}
 
-    return "";
+char* prompt_input(char* prompt) {
+    return NULL;
 }

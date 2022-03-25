@@ -12,6 +12,10 @@ long_mode_start:
     mov gs, ax      ;
 
     ;print 'OK'
-    call kernel_main
+    call start_kernel 
     ;mov dword [0xb8000], 0x2f4b2f4f
     hlt
+
+start_kernel:
+    call kernel_main
+    ret
